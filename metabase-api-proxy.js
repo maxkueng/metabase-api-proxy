@@ -182,10 +182,6 @@ function start() {
     proxyReq.setHeader('X-Metabase-Session', sessionID);
   });
 
-  proxy.on('proxyRes', function (proxyRes, req, res) {
-    console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
-  });
-
   proxy.on('error', (err, req, res) => {
     console.error(err);
     res.writeHead(500, {
