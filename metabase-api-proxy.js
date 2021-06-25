@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const express = require('express');
 const { asyncMiddleware } = require('middleware-async')
+const cors = require('cors');
 const httpProxy = require('http-proxy');
 const yargs = require('yargs');
 const yaml = require('yaml');
@@ -169,6 +170,13 @@ function createServer(config, requestListener) {
   return http.createServer(requestListener);
 }
 
+const enableCors = function(req, res) {
+  res.setHeader('access-control-allow-methods', '*');
+  res.setHeader('access-control-allow-origin', '*');
+  res.setHeader('access-control-allow-headers', '*');
+  res.setHeader('access-control-allow-credentials', 'true');
+};
+
 function start() {
   const config = getConfig();
   const app = express();
@@ -176,10 +184,15 @@ function start() {
 
   const proxy = httpProxy.createProxyServer({
     target: config.proxy.target,
+    secure: false,
   });
 
-  proxy.on('proxyReq', function(proxyReq, req, res, options) {
+  proxy.on('proxyReq', (proxyReq, req, res, options) => {
     proxyReq.setHeader('X-Metabase-Session', sessionID);
+  });
+
+  proxy.on('proxyRes', (proxyRes, req, res) => {
+    enableCors(req, res);
   });
 
   proxy.on('error', (err, req, res) => {
@@ -205,6 +218,10 @@ function start() {
   app.use((req, res) => {
     proxy.web(req, res);
   });
+
+  app.use(cors({
+    origin: '*',
+  }));
 
   const server = createServer(config, app);
   const port = getPort(config);
