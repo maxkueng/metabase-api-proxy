@@ -110,7 +110,6 @@ function getConfig() {
   }
 
   const contents = fs.readFileSync(configPath, 'utf-8');
-  console.log(contents);
 
   let values;
   try {
