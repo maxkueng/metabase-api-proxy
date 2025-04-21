@@ -6,4 +6,4 @@ docker run \
   -v $PWD/selfsigned.key:/opt/privkey.pem:ro \
   -v $PWD/selfsigned.crt:/opt/fullchain.pem:ro \
   -p 8011:443 \
-  maxkueng/metabase-api-proxy:latest
+  metabase-api-proxy
